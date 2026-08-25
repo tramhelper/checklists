@@ -1,7 +1,7 @@
 window.checklistsData.push({
     id: "anschlusstreffen_all",
     type: "standard",
-    applicableTypes: ["NGT6", "NGT8", "NGT8DD", "NGT12DD", "NGTDX"],
+    applicableTypes: ["NGT6DD", "NGT8DD", "NGTD8DD", "NGTD12DD", "NGTDXDD"],
     title: "Dienstbetrieb: Anschlusstreffen & Anschlussmanager",
     categories: [
         {
