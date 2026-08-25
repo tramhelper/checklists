@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DVB Fahrer-Checklisten</title>
+    <style>
+        :root {
+            --primary: #ffcc00; /* DVB Gelb */
+            --bg: #f4f4f9;
+            --text: #333;
+            --card-bg: #ffffff;
+            --success: #4caf50;
+            --success-bg: #e8f5e9;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            padding-top: 150px; 
+        }
+
+        /* --- KOPFBEREICH (TOPBAR) --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--primary);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px 5px 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-nav {
+            background-color: var(--text);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-nav.active {
+            background-color: white;
+            color: var(--text);
+            border: 2px solid var(--text);
+        }
+
+        .filters {
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            padding: 10px 20px 15px 20px;
+            overflow-x: auto;
+            white-space: nowrap;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .filters::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        select {
+            font-size: 16px;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background-color: white;
+            appearance: none;
+            min-width: 140px;
+        }
+
+        /* --- HAUPTBEREICH & CONTAINER --- */
+        main {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding-bottom: 100px; 
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        /* --- MENÜ ANSICHT --- */
+        .menu-section-title {
+            font-size: 22px;
+            border-bottom: 3px solid #ccc;
+            padding-bottom: 5px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            color: #444;
+        }
+
+        .menu-item {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        .menu-item:active {
+            background-color: #f0f0f0;
+        }
+
+        .menu-item.completed {
+            background-color: var(--success-bg);
+            opacity: 0.8;
+        }
+
+        .menu-item.completed .menu-title {
+            text-decoration: line-through;
+            color: #555;
+        }
+
+        .menu-checkbox {
+            width: 32px;
+            height: 32px;
+            margin-right: 20px;
+            flex-shrink: 0;
+            pointer-events: auto; 
+        }
+
+        .menu-content {
+            flex-grow: 1;
+        }
+
+        .menu-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .menu-arrow {
+            font-size: 24px;
+            color: #aaa;
+            padding-left: 15px;
+        }
+
+        /* --- CHECKLISTEN ANSICHT --- */
+        .checklist-title {
+            font-size: 26px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--text);
+        }
+
+        .category-title {
+            font-size: 20px;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 5px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .task-group {
+            margin-bottom: 12px;
+        }
+
+        .task-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: background 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        .task-group > .task-card {
+            margin-bottom: 8px; /* Abstand zu Unteraufgaben */
+        }
+
+        .task-card:active {
+            background-color: #f0f0f0;
+        }
+
+        .task-card.checked {
+            opacity: 0.7;
+            background-color: var(--success-bg);
+        }
+
+        .task-card.checked .task-text {
+            text-decoration: line-through;
+            color: #555;
+        }
+
+        .task-checkbox {
+            width: 32px;
+            height: 32px;
+            margin-right: 20px;
+            flex-shrink: 0;
+            pointer-events: none;
+        }
+
+        .task-content {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .task-text {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .task-note {
+            font-size: 14px;
+            color: #666;
+            margin-top: 6px;
+            background: #fff3cd;
+            padding: 6px 10px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        /* Styling für Unteraufgaben */
+        .subtasks-list {
+            margin-top: 5px;
+            padding-left: 30px; /* Einrückung */
+            margin-bottom: 25px;
+        }
+
+        .subtask-card {
+            background: #f9f9fb;
+            border-left: 4px solid var(--primary);
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            box-shadow: none;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .subtask-card .task-text {
+            font-size: 16px;
+            color: #444;
+        }
+
+        /* Notes in Unterpunkten etwas anpassen */
+        .subtask-card .task-note {
+            background: #fff;
+            border: 1px solid #e1e1e8;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: #777;
+        }
+
+        /* --- SCHWEBENDER ZURÜCK-BUTTON --- */
+        .fab-back {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--text);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 1000;
+            display: none; 
+        }
+
+        .fab-back:active {
+            background-color: #555;
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-top">
+            <h1>DVB Checklisten</h1>
+            <div class="nav-buttons">
+                <button id="btnNavMenu" class="btn-nav active" onclick="showMenu()">Hauptmenü</button>
+                <button id="btnNavLocations" class="btn-nav" onclick="showLocations()">Betriebsstellen</button>
+            </div>
+        </div>
+        <div class="filters">
+            <div class="filter-group">
+                <label>Fahrzeug:</label>
+                <select id="tramType" onchange="updateFilters()">
+                    <option value="NGT6">NGT6</option>
+                    <option value="NGT8">NGT8</option>
+                    <option value="NGT8DD">NGT8DD</option>
+                    <option value="NGT12DD">NGT12DD</option>
+                    <option value="NGTDX">NGTDX</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Ausrücken:</label>
+                <select id="startDepot" onchange="updateFilters()">
+                    <option value="Gorbitz">Gorbitz</option>
+                    <option value="Reick">Reick</option>
+                    <option value="Trachenberge">Trachenberge</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Einrücken:</label>
+                <select id="endDepot" onchange="updateFilters()">
+                    <option value="Gorbitz">Gorbitz</option>
+                    <option value="Reick">Reick</option>
+                    <option value="Trachenberge">Trachenberge</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div id="view-menu" class="view active">
+            <div class="menu-section-title">Standard-Checklisten</div>
+            <div id="menuContainer"></div>
+        </div>
+
+        <div id="view-locations" class="view">
+            <div class="menu-section-title">Hinweise zu Betriebsstellen</div>
+            <div id="locationsContainer"></div>
+        </div>
+
+        <div id="view-checklist" class="view">
+            <h2 class="checklist-title" id="currentChecklistTitle">Titel</h2>
+            <div id="checklistContainer"></div>
+        </div>
+    </main>
+
+    <button id="fabBack" class="fab-back" onclick="goBack()">◀ Zurück</button>
+
+    <script>
+        // ==========================================
+        // FAHRZEUG KONFIGURATION (Anzahl Wagenkästen)
+        // ==========================================
+        const tramConfig = {
+            "NGT6": { wagenkaesten: 5 },
+            "NGT8": { wagenkaesten: 5 }, 
+            "NGT8DD": { wagenkaesten: 7 }, 
+            "NGT12DD": { wagenkaesten: 5 },
+            "NGTDX": { wagenkaesten: 5 }
+        };
+
+        // ==========================================
+        // DATENBANK: HIER NEUE CHECKLISTEN HINZUFÜGEN
+        // ==========================================
+        const checklistsData = [
+            {
+                id: "aufruesten_all",
+                type: "standard",
+                applicableTypes: ["NGT6", "NGT8", "NGT8DD", "NGT12DD", "NGTDX"], 
+                title: "Aufrüsten & Abfahrtskontrolle",
+                categories: [
+                    {
+                        name: "Aufrüsten im Führerstand",
+                        tasks: [
+                            { 
+                                text: "Fahrzeug aktivieren",
+                                subtasks: [
+                                    { text: "Batterieschalter EIN" },
+                                    { text: "Stromabnehmer heben" },
+                                    { text: "Schlüssel stecken (Position 1)" },
+                                    { text: "Fahrtrichtungswähler in Sternchen (*)" }
+                                ]
+                            },
+                            { 
+                                text: "Komponententest durchführen & Fahrersitz einstellen",
+                                subtasks: [
+                                    { text: "Komponententest starten" },
+                                    { text: "Nach erstem Durchlauf: weiter mit Komponententestknopf" },
+                                    { text: "Fahrersitz einstellen" },
+                                    { text: "Abschluss durch erneutes Drücken der Taste" }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "Fahrzeugkontrolle (Wagenkästen)",
+                        dynamic: "wagenkaesten_loop", // MAGISCHER BEFEHL für abwechselnd Außen/Innen
+                        outerTasks: [
+                            { text: "Wagenkasten kontrollieren", note: "Läuft Flüssigkeit aus?" },
+                            { text: "Sandung überprüfen", note: "Hat der Sand gesandet? (Nur angetriebene Fahrwerke)" },
+                            { text: "Fahrzeugseiten überprüfen", note: "Sichtbare Schäden?" },
+                            { text: "Stromabnehmer überprüfen", note: "Schäden? Sollbruchstellen klein genug?" },
+                            { text: "Türen allgemein", note: "Lichtschranke, Einklemmschutz, Türtaster" },
+                            { text: "Erste Tür: Rampe", note: "Rampe herausnehmen und Rampentaster prüfen.", onlyFirst: true }
+                        ],
+                        innerTasks: [
+                            { text: "Entwerter testen" },
+                            { text: "Fahrkartenautomat testen", onlyFirst: true },
+                            { text: "Fahrgastraum", note: "Auf Schmutz überprüfen." },
+                            { text: "Sandfüllstand überprüfen", note: "Komplett durch Öffnen des Behälters (Guckloch)." },
+                            { text: "Heckfahrstand überprüfen", note: "Prüfen, ob dieser verschlossen ist.", onlyLast: true }
+                        ]
+                    },
+                    {
+                        name: "Beleuchtung & Wischer",
+                        tasks: [
+                            { 
+                                text: "Außenbeleuchtung prüfen", 
+                                subtasks: [
+                                    { text: "Abblendlicht & Warnblinklicht an (Wurde nach Komponententest eingeschaltet)" },
+                                    { text: "Blinkt das Warnblinklicht außen?" },
+                                    { text: "ZG2 (Schlusslicht) - Ist das Schlusslicht an?" }
+                                ]
+                            },
+                            { 
+                                text: "Scheibenwischer prüfen", 
+                                subtasks: [
+                                    { text: "Hinten: Leicht anheben und prüfen" },
+                                    { text: "Vorne: Leicht anheben und prüfen" },
+                                    { text: "Vorne seitlich: Leicht anheben und prüfen" }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "IBIS & Leitstelle",
+                        tasks: [
+                            { 
+                                text: "IBIS vorbereiten", 
+                                subtasks: [
+                                    { text: "Dienstnummer eingeben (Eingabe: 1 1)" },
+                                    { text: "Linie / Kurs eingeben (Mit führender Null, z.B. 0582)" }
+                                ]
+                            },
+                            { 
+                                text: "Kommunikation Leitstelle (LS)", 
+                                subtasks: [
+                                    { text: "Anmeldung über Status 13" },
+                                    { text: "Langer Gruß, Linie & Kurs nennen" },
+                                    { text: "Nach Störungen fragen & wiederholen" },
+                                    { text: "Gespräch endet durch Leitstelle mit 'Ende'" }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "Abschluss",
+                        tasks: [
+                            { 
+                                text: "Abfahrbereit machen",
+                                subtasks: [
+                                    { text: "Abblendlicht einschalten" },
+                                    { text: "Spiegel ausklappen und einstellen" }
+                                ]
+                            },
+                            { 
+                                text: "Besonderheit Ausfahrt Gorbitz beachten!", 
+                                note: "Standard ist Ausfahrt 1. Bei Ausfahrt über Tor 2 muss an der Fahrstraßenauswahl korrigiert werden.",
+                                condition: (context) => context.startDepot === "Gorbitz" 
+                            },
+                            { 
+                                text: "Besonderheit Ausfahrt Btf. Reick beachten!", 
+                                subtasks: [
+                                    { text: "Bedienterminal erst NACH Absprache mit dem Einsatzleiter benutzen" },
+                                    { text: "Ausfahrt per Anleitung am Terminal einstellen" },
+                                    { text: "Fahrtrichtung prüfen: Landwärts = LINKS (Ri. Albert-Wolf-Platz) | Stadtwärts = RECHTS (Ri. Trattendorfer Str.)" }
+                                ],
+                                condition: (context) => context.startDepot === "Reick" 
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: "einruecken_all",
+                type: "standard",
+                applicableTypes: ["NGT6", "NGT8", "NGT8DD", "NGT12DD", "NGTDX"],
+                title: "Einrücken & Abstellen",
+                categories: [
+                    {
+                        name: "Einrücken Btf. Gorbitz",
+                        condition: (context) => context.endDepot === "Gorbitz",
+                        tasks: [
+                            { 
+                                text: "Vorbereitung IBIS & Funk", 
+                                subtasks: [
+                                    { text: "Telefonbuch im IBIS auswählen -> Gorbitz" },
+                                    { text: "Funkspruch: 'Wagennummer möchte einrücken.'" },
+                                    { text: "Hinweise wiederholen und beenden." }
+                                ]
+                            },
+                            { 
+                                text: "Einfahrt Gleisschleife", 
+                                subtasks: [
+                                    { text: "Rechter Taster: Tor 1" },
+                                    { text: "Mittlerer Taster: Tor 2 (Werkstatt)" },
+                                    { text: "Linker Taster: Zurück in Schleife" }
+                                ]
+                            },
+                            { 
+                                text: "Bei inaktiver Fahrstraße", 
+                                note: "Elektrische Weichen müssen handgestellt werden (auch stumpf befahrene, um mechanisches Auffahren zu verhindern)!" 
+                            }
+                        ]
+                    },
+                    {
+                        name: "Einrücken Btf. Reick",
+                        condition: (context) => context.endDepot === "Reick",
+                        tasks: [
+                            { 
+                                text: "Allgemeine Hinweise", 
+                                subtasks: [
+                                    { text: "Im Normalfall ohne Anmeldung einrücken." },
+                                    { text: "11.30 bis 15.00 Uhr: Kein Einsatzleiter in Reick! Bei Gesprächsbedarf in Gorbitz melden." }
+                                ]
+                            },
+                            { 
+                                text: "Besonderheiten auf der Strecke", 
+                                subtasks: [
+                                    { text: "Signal SO61 / SO62: Wenn Signal nicht steht, Kreuzung mit PKW-Verkehr nicht befahren." },
+                                    { text: "Genug Abstand halten, damit eigene Zuweisung nicht auf vorderes Fahrzeug angewendet wird." },
+                                    { text: "Blinkt Leuchte BTF? Sofort vor Signal anhalten & Einsatzleiter kontaktieren." }
+                                ]
+                            },
+                            { text: "Abstellen in der Halle", note: "Rettungswege (gelb) unbedingt freihalten!" }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: "abruesten_all",
+                type: "standard",
+                applicableTypes: ["NGT6", "NGT8", "NGT8DD", "NGT12DD", "NGTDX"],
+                title: "Abrüsten des Fahrzeugs",
+                categories: [
+                    {
+                        name: "Systeme abmelden",
+                        tasks: [
+                            { 
+                                text: "Fahrzeug abmelden", 
+                                subtasks: [
+                                    { text: "Fahrzeug am IBIS abmelden (Schlüsselsymbol)" },
+                                    { text: "Fahrzeugmatrix kontrollieren (Verschwinden Linie/Kurs?)" }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "Führerstand",
+                        tasks: [
+                            { 
+                                text: "Fahrzeug abschalten", 
+                                subtasks: [
+                                    { text: "Abblendlicht ausschalten" },
+                                    { text: "Türfreigabe (Gegebenenfalls zuvor Türöffnung betätigen)" },
+                                    { text: "Fahrtrichtungswähler auf 0" },
+                                    { text: "Schlüssel abziehen" },
+                                    { text: "Stromabnehmer senken" },
+                                    { text: "Batterieschalter ausschalten" }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            // ==========================================
+            // STÖRUNG: BNU-SCHADEN
+            // ==========================================
+            {
+                id: "stoerung_bnu",
+                type: "standard",
+                applicableTypes: ["NGT6", "NGT8", "NGT8DD", "NGT12DD", "NGTDX"],
+                title: "Störung: BNU-Ausfall (Bordnetz)",
+                categories: [
+                    {
+                        name: "Sofortmaßnahmen (Alle Fahrzeuge)",
+                        tasks: [
+                            {
+                                text: "Leitstelle unverzüglich informieren",
+                                subtasks: [
+                                    { text: "Standort & Störung 'BNU-Ausfall' melden" },
+                                    { text: "Prüfen: Ist das Erreichen der Werkstatt / eines Betriebshofes in der Restzeit realistisch?" },
+                                    { text: "Falls NEIN: Geeigneten Abstellort ansteuern (zum Auskuppeln/Abschleppen)" }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "Batterie-Pufferung: NGT6 & NGT8",
+                        condition: (context) => ["NGT6", "NGT8"].includes(context.tramType),
+                        tasks: [
+                            {
+                                text: "Restfahrzeit beachten: MAX. 20 MINUTEN!",
+                                note: "Batterie puffert nur kurz. Nach Ablauf fällt die Federspeicherbremse ein!"
+                            },
+                            {
+                                text: "Verbraucher-Budget streng einhalten",
+                                subtasks: [
+                                    { text: "Maximal 15× Federspeicherbremse betätigen" },
+                                    { text: "Maximal 1× Außenmatrix ändern" },
+                                    { text: "Maximal 1× Türfreigabe setzen und zurücknehmen" },
+                                    { text: "Maximal 1× Schienenbremse nutzen" }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "Batterie-Pufferung: NGT8DD & NGT12DD",
+                        condition: (context) => ["NGT8DD", "NGT12DD"].includes(context.tramType),
+                        tasks: [
+                            {
+                                text: "Restfahrzeit beachten: MAX. 30 MINUTEN!",
+                                note: "Batterie-Pufferung reicht für maximal 30 Minuten Weiterfahrt."
+                            },
+                            {
+                                text: "Verbraucher-Budget streng einhalten",
+                                subtasks: [
+                                    { text: "Maximal 1× Außenmatrix ändern" },
+                                    { text: "Maximal 1× Türfreigabe bedienen" },
+                                    { text: "Maximal 1× Schienenbremse nutzen" }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "Verhalten beim NGTDX",
+                        condition: (context) => context.tramType === "NGTDX",
+                        tasks: [
+                            {
+                                text: "Status der Umformer am Display prüfen",
+                                subtasks: [
+                                    { 
+                                        text: "Fall A: Nur 1 Umformer defekt (Nebenverbraucher)", 
+                                        note: "Weiterfahrt MÖGLICH! Reduziertes Komfortangebot (Klima/Heizung gedrosselt bzw. aus)." 
+                                    },
+                                    { 
+                                        text: "Fall B: Beide Umformer defekt", 
+                                        note: "KEINE Weiterfahrt auf eigener Achse. Fahrzeug muss abgeschleppt werden!" 
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            // ==========================================
+            // STÖRUNG: TÜRSTÖRUNG
+            // ==========================================
+            {
+                id: "stoerung_tuer",
+                type: "standard",
+                applicableTypes: ["NGT6", "NGT8", "NGT8DD", "NGT12DD", "NGTDX"],
+                title: "Störung: Türstörung / Tür defekt",
+                categories: [
+                    {
+                        name: "Sicherheits- & Räumungskriterien",
+                        tasks: [
+                            {
+                                text: "Fluchtwege kontrollieren",
+                                note: "ACHTUNG: Sind ZWEI nebeneinanderliegende Türen defekt, darf das Fahrzeug wegen unzureichender Fluchtwege NICHT mehr für den Fahrgastverkehr genutzt werden (Ausschieben/Einrücken)!"
+                            }
+                        ]
+                    },
+                    {
+                        name: "Besonderheiten: Tür 1 defekt (Mobilitätseingeschränkte Personen)",
+                        tasks: [
+                            {
+                                text: "Umgang mit mobilitätseingeschränkten Fahrgästen",
+                                subtasks: [
+                                    { 
+                                        text: "Ausstieg an NICHT barrierefreien Haltestellen", 
+                                        note: "Rampe für aussteigende Personen per Notentriegelung manuell herausziehen." 
+                                    },
+                                    { 
+                                        text: "Zustieg an NICHT barrierefreien Haltestellen", 
+                                        note: "Keine weiteren mobilitätseingeschränkten Personen mitnehmen!" 
+                                    },
+                                    { 
+                                        text: "Zustieg an barrierefreien Haltestellen", 
+                                        note: "Fahrgast nach Zielhaltestelle fragen, um zu prüfen, ob die Zielhaltestelle barrierefrei ist bzw. die Rampe gebraucht wird." 
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "Manuelle Türverriegelung (NGT6 / NGT8)",
+                        condition: (context) => ["NGT6", "NGT8"].includes(context.tramType),
+                        tasks: [
+                            {
+                                text: "Türflügel mechanisch sichern",
+                                subtasks: [
+                                    { text: "Notentriegelung an der betroffenen Tür ziehen" },
+                                    { text: "Mithilfe eines Fahrgastes die Türflügel vollständig zuhalten" },
+                                    { text: "Tür mit Vierkant unten rechts fest verriegeln" },
+                                    { text: "Prüfen: Grünschleife (Türüberwachung) muss leuchten!" }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            // ==========================================
+            // BETRIEBSSTELLEN
+            // ==========================================
+            // ==========================================
+            // BETRIEBSSTELLE: KLEINZSCHACHWITZ
+            // ==========================================
+            {
+                id: "bs_kleinzschachwitz",
+                type: "location",
+                title: "Kleinzschachwitz (Gleisschleife)",
+                categories: [
+                    {
+                        name: "Besonderheiten Schleifenfahrt",
+                        tasks: [
+                            { 
+                                text: "Inneren Bogen (rechts) befahren", 
+                                note: "ACHTUNG: Bogen rechts wird NUR auf ausdrückliche Anweisung der Leitstelle bzw. des Dispatchers befahren! (Handstellweiche)" 
+                            },
+                            { 
+                                text: "Ausstiegshaltestelle beachten", 
+                                note: "An der Ausstiegshaltestelle stehen bleiben, falls noch ein Fahrzeug an der Einstiegshaltestelle steht." 
+                            }
+                        ]
+                    }
+                ]
+            },
+        ];
+
+        // ==========================================
+        // LOGIK & STATE MANAGEMENT
+        // ==========================================
+        let currentContext = {};
+        let activeChecklistId = null;
+        let currentView = 'menu';
+        let previousView = 'menu';
+        
+        let listCompletionState = {}; 
+        let taskCompletionState = {}; 
+
+        function getContext() {
+            return {
+                tramType: document.getElementById('tramType').value,
+                startDepot: document.getElementById('startDepot').value,
+                endDepot: document.getElementById('endDepot').value
+            };
+        }
+
+        window.updateFilters = function() {
+            currentContext = getContext();
+            if (currentView === 'menu') renderMenu();
+            else if (currentView === 'checklist') openChecklist(activeChecklistId, true);
+        };
+
+        window.showMenu = function() {
+            currentView = 'menu';
+            document.getElementById('view-menu').classList.add('active');
+            document.getElementById('view-locations').classList.remove('active');
+            document.getElementById('view-checklist').classList.remove('active');
+            document.getElementById('btnNavMenu').classList.add('active');
+            document.getElementById('btnNavLocations').classList.remove('active');
+            document.getElementById('fabBack').style.display = 'none';
+            renderMenu();
+            window.scrollTo(0, 0);
+        };
+
+        window.showLocations = function() {
+            currentView = 'locations';
+            document.getElementById('view-locations').classList.add('active');
+            document.getElementById('view-menu').classList.remove('active');
+            document.getElementById('view-checklist').classList.remove('active');
+            document.getElementById('btnNavLocations').classList.add('active');
+            document.getElementById('btnNavMenu').classList.remove('active');
+            document.getElementById('fabBack').style.display = 'none';
+            renderLocations();
+            window.scrollTo(0, 0);
+        };
+
+        window.goBack = function() {
+            if (previousView === 'locations') showLocations();
+            else showMenu();
+        };
+
+        function renderMenu() {
+            const container = document.getElementById('menuContainer');
+            container.innerHTML = ''; 
+            const lists = checklistsData.filter(l => l.type === 'standard' && l.applicableTypes.includes(currentContext.tramType));
+            if (lists.length === 0) return container.innerHTML = `<div class="empty-state">Keine Checklisten für dieses Fahrzeug.</div>`;
+            lists.forEach(list => container.appendChild(createMenuItem(list, 'menu')));
+        }
+
+        function renderLocations() {
+            const container = document.getElementById('locationsContainer');
+            container.innerHTML = ''; 
+            const lists = checklistsData.filter(l => l.type === 'location');
+            if (lists.length === 0) return container.innerHTML = `<div class="empty-state">Keine Betriebsstellen hinterlegt.</div>`;
+            lists.forEach(list => container.appendChild(createMenuItem(list, 'locations')));
+        }
+
+        function createMenuItem(list, sourceView) {
+            const isCompleted = !!listCompletionState[list.id];
+            const div = document.createElement('div');
+            div.className = `menu-item ${isCompleted ? 'completed' : ''}`;
+            div.onclick = (e) => {
+                if(e.target.type !== 'checkbox') {
+                    previousView = sourceView;
+                    openChecklist(list.id, false);
+                }
+            };
+            div.innerHTML = `
+                <input type="checkbox" class="menu-checkbox" ${isCompleted ? 'checked' : ''} 
+                       onchange="toggleEntireList('${list.id}', this.checked, '${sourceView}')">
+                <div class="menu-content"><div class="menu-title">${list.title}</div></div>
+                <div class="menu-arrow">▶</div>
+            `;
+            return div;
+        }
+
+        // Neue magische Funktion für die abwechselnden Wagenkästen
+        function getExpandedCategories(list, context) {
+            let result = [];
+            list.categories.forEach((category, catIndex) => {
+                if (category.dynamic === 'wagenkaesten_loop') {
+                    const count = tramConfig[context.tramType].wagenkaesten || 5;
+                    let generatedTasks = [];
+                    
+                    for (let i = 1; i <= count; i++) {
+                        // Außen-Subtasks filtern (Erste Tür etc.)
+                        let outerSub = category.outerTasks.filter(t => {
+                            if (t.onlyFirst && i !== 1) return false;
+                            if (t.onlyLast && i !== count) return false;
+                            return true;
+                        });
+                        if (outerSub.length > 0) {
+                            generatedTasks.push({
+                                text: `Wagenkasten ${i} Außen`,
+                                subtasks: outerSub
+                            });
+                        }
+                        
+                        // Innen-Subtasks filtern (Heckfahrstand etc.)
+                        let innerSub = category.innerTasks.filter(t => {
+                            if (t.onlyFirst && i !== 1) return false;
+                            if (t.onlyLast && i !== count) return false;
+                            return true;
+                        });
+                        if (innerSub.length > 0) {
+                            generatedTasks.push({
+                                text: `Wagenkasten ${i} Innen`,
+                                subtasks: innerSub
+                            });
+                        }
+                    }
+                    
+                    result.push({
+                        name: category.name,
+                        originalCatIndex: catIndex,
+                        condition: category.condition,
+                        tasks: generatedTasks.map((t, idx) => ({ task: t, taskIndex: idx }))
+                    });
+                } else {
+                    result.push({
+                        name: category.name,
+                        originalCatIndex: catIndex,
+                        condition: category.condition,
+                        tasks: category.tasks.map((task, taskIndex) => ({ task, taskIndex }))
+                    });
+                }
+            });
+            return result;
+        }
+
+        window.toggleEntireList = function(listId, isChecked, sourceView) {
+            listCompletionState[listId] = isChecked;
+            if (!taskCompletionState[listId]) taskCompletionState[listId] = {};
+            const state = taskCompletionState[listId];
+            const list = checklistsData.find(l => l.id === listId);
+            const expanded = getExpandedCategories(list, currentContext);
+            
+            expanded.forEach((cat) => {
+                cat.tasks.forEach((item) => {
+                    const tId = `${cat.originalCatIndex}-0-${item.taskIndex}`;
+                    state[tId] = isChecked;
+                    if (item.task.subtasks) {
+                        item.task.subtasks.forEach((_, subIndex) => { state[`${tId}-${subIndex}`] = isChecked; });
+                    }
+                });
+            });
+
+            if (sourceView === 'menu') renderMenu();
+            if (sourceView === 'locations') renderLocations();
+        };
+
+        window.openChecklist = function(listId, isLiveUpdate = false) {
+            currentView = 'checklist';
+            activeChecklistId = listId;
+            const list = checklistsData.find(l => l.id === listId);
+            document.getElementById('currentChecklistTitle').innerText = list.title;
+            const container = document.getElementById('checklistContainer');
+            container.innerHTML = '';
+
+            if (!taskCompletionState[listId]) taskCompletionState[listId] = {};
+            const state = taskCompletionState[listId];
+            const expandedCategories = getExpandedCategories(list, currentContext);
+            let hasVisibleTasks = false;
+
+            expandedCategories.forEach(cat => {
+                if (cat.condition && !cat.condition(currentContext)) return;
+                let html = `<div class="category-title">${cat.name}</div>`;
+                let catHasTasks = false;
+
+                cat.tasks.forEach(item => {
+                    if (item.task.condition && !item.task.condition(currentContext)) return;
+                    hasVisibleTasks = true;
+                    catHasTasks = true;
+                    
+                    const tId = `${cat.originalCatIndex}-0-${item.taskIndex}`;
+                    const isParentChecked = !!state[tId];
+
+                    html += `<div class="task-group">`;
+                    
+                    if (item.task.subtasks && item.task.subtasks.length > 0) {
+                        html += `
+                            <label class="task-card parent-card ${isParentChecked ? 'checked' : ''}">
+                                <input type="checkbox" class="task-checkbox parent-cb" ${isParentChecked ? 'checked' : ''} 
+                                       onchange="toggleParent(this, '${tId}')">
+                                <div class="task-content">
+                                    <div class="task-text">${item.task.text}</div>
+                                    ${item.task.note ? `<div class="task-note">${item.task.note}</div>` : ''}
+                                </div>
+                            </label>
+                            <div class="subtasks-list">
+                        `;
+                        item.task.subtasks.forEach((sub, subIndex) => {
+                            const isSubChecked = !!state[`${tId}-${subIndex}`];
+                            html += `
+                                <label class="task-card subtask-card ${isSubChecked ? 'checked' : ''}">
+                                    <input type="checkbox" class="task-checkbox sub-cb" ${isSubChecked ? 'checked' : ''} 
+                                           onchange="toggleSub(this, '${tId}', '${subIndex}')">
+                                    <div class="task-content">
+                                        <div class="task-text">${sub.text}</div>
+                                        ${sub.note ? `<div class="task-note">${sub.note}</div>` : ''}
+                                    </div>
+                                </label>
+                            `;
+                        });
+                        html += `</div>`;
+                    } else {
+                        html += `
+                            <label class="task-card ${isParentChecked ? 'checked' : ''}">
+                                <input type="checkbox" class="task-checkbox" ${isParentChecked ? 'checked' : ''} 
+                                       onchange="toggleTask(this, '${tId}')">
+                                <div class="task-content">
+                                    <div class="task-text">${item.task.text}</div>
+                                    ${item.task.note ? `<div class="task-note">${item.task.note}</div>` : ''}
+                                </div>
+                            </label>
+                        `;
+                    }
+                    html += `</div>`;
+                });
+
+                if (catHasTasks) container.innerHTML += html;
+            });
+
+            if (!hasVisibleTasks) container.innerHTML = `<div class="empty-state">Für diese Filter gibt es hier keine Aufgaben.</div>`;
+
+            document.getElementById('view-menu').classList.remove('active');
+            document.getElementById('view-locations').classList.remove('active');
+            document.getElementById('view-checklist').classList.add('active');
+            document.getElementById('fabBack').style.display = 'block';
+            if (!isLiveUpdate) window.scrollTo(0, 0);
+        };
+
+        window.toggleTask = function(checkbox, tId) {
+            const card = checkbox.closest('.task-card');
+            if (checkbox.checked) card.classList.add('checked');
+            else card.classList.remove('checked');
+            taskCompletionState[activeChecklistId][tId] = checkbox.checked;
+            checkIfListIsComplete(activeChecklistId);
+        };
+
+        window.toggleParent = function(checkbox, tId) {
+            const group = checkbox.closest('.task-group');
+            const parentCard = group.querySelector('.parent-card');
+            
+            if (checkbox.checked) parentCard.classList.add('checked');
+            else parentCard.classList.remove('checked');
+
+            taskCompletionState[activeChecklistId][tId] = checkbox.checked;
+            
+            const subCbs = group.querySelectorAll('.sub-cb');
+            subCbs.forEach((subCb, index) => {
+                subCb.checked = checkbox.checked;
+                const subCard = subCb.closest('.subtask-card');
+                if (checkbox.checked) subCard.classList.add('checked');
+                else subCard.classList.remove('checked');
+                taskCompletionState[activeChecklistId][`${tId}-${index}`] = checkbox.checked;
+            });
+
+            checkIfListIsComplete(activeChecklistId);
+        };
+
+        window.toggleSub = function(checkbox, pId, subIndex) {
+            const card = checkbox.closest('.subtask-card');
+            if (checkbox.checked) card.classList.add('checked');
+            else card.classList.remove('checked');
+            taskCompletionState[activeChecklistId][`${pId}-${subIndex}`] = checkbox.checked;
+
+            const group = checkbox.closest('.task-group');
+            const subCbs = group.querySelectorAll('.sub-cb');
+            let allChecked = true;
+            subCbs.forEach(cb => { if(!cb.checked) allChecked = false; });
+
+            const parentCb = group.querySelector('.parent-cb');
+            const parentCard = group.querySelector('.parent-card');
+            parentCb.checked = allChecked;
+            taskCompletionState[activeChecklistId][pId] = allChecked;
+            
+            if (allChecked) parentCard.classList.add('checked');
+            else parentCard.classList.remove('checked');
+
+            checkIfListIsComplete(activeChecklistId);
+        };
+
+        function checkIfListIsComplete(listId) {
+            const list = checklistsData.find(l => l.id === listId);
+            const state = taskCompletionState[listId] || {};
+            let allDone = true;
+            const expanded = getExpandedCategories(list, currentContext);
+            
+            expanded.forEach((cat) => {
+                if (cat.condition && !cat.condition(currentContext)) return;
+                cat.tasks.forEach((item) => {
+                    if (item.task.condition && !item.task.condition(currentContext)) return;
+                    const tId = `${cat.originalCatIndex}-0-${item.taskIndex}`;
+                    if (!state[tId]) allDone = false;
+                });
+            });
+            listCompletionState[listId] = allDone;
+        }
+
+        updateFilters(); 
+    </script>
+</body>
+</html>
