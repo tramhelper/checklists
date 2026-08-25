@@ -1,19 +1,5 @@
 window.checklistsData.push(
     {
-        id: "bs_postplatz",
-        type: "location",
-        title: "Postplatz",
-        categories: [
-            {
-                name: "Allgemein",
-                tasks: [
-                    { text: "Auf querende Fußgänger achten", note: "Besonders im Bereich der Käseglocke." },
-                    { text: "Weichensteuerung prüfen", note: "Abzweig Richtung Wallstraße genau beobachten." }
-                ]
-            }
-        ]
-    },
-    {
         id: "bs_kleinzschachwitz",
         type: "location",
         title: "Kleinzschachwitz (Gleisschleife)",
