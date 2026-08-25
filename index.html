@@ -336,11 +336,11 @@
             <div class="filter-group">
                 <label>Fahrzeug:</label>
                 <select id="tramType" onchange="updateFilters()">
-                    <option value="NGT6">NGT6</option>
-                    <option value="NGT8">NGT8</option>
+                    <option value="NGT6DD">NGT6DD</option>
                     <option value="NGT8DD">NGT8DD</option>
-                    <option value="NGT12DD">NGT12DD</option>
-                    <option value="NGTDX">NGTDX</option>
+                    <option value="NGTD8DD">NGTD8DD</option>
+                    <option value="NGTD12DD">NGTD12DD</option>
+                    <option value="NGTDXDD">NGTDXDD</option>
                 </select>
             </div>
             <div class="filter-group">
@@ -386,11 +386,11 @@
         // FAHRZEUG KONFIGURATION (Anzahl Wagenkästen)
         // ==========================================
         const tramConfig = {
-            "NGT6": { wagenkaesten: 5 },
-            "NGT8": { wagenkaesten: 5 }, 
-            "NGT8DD": { wagenkaesten: 7 }, 
-            "NGT12DD": { wagenkaesten: 5 },
-            "NGTDX": { wagenkaesten: 5 }
+            "NGT6DD": { wagenkaesten: 5 },
+            "NGT8DD": { wagenkaesten: 5 }, 
+            "NGTD8DD": { wagenkaesten: 7 }, 
+            "NGTD12DD": { wagenkaesten: 5 },
+            "NGTDXDD": { wagenkaesten: 5 }
         };
 
         // ==========================================
@@ -400,7 +400,7 @@
             {
                 id: "aufruesten_all",
                 type: "standard",
-                applicableTypes: ["NGT6", "NGT8", "NGT8DD", "NGT12DD", "NGTDX"], 
+                applicableTypes: ["NGT6DD", "NGT8DD", "NGTD8DD", "NGTD12DD", "NGTDXDD"], 
                 title: "Aufrüsten & Abfahrtskontrolle",
                 categories: [
                     {
@@ -518,7 +518,7 @@
             {
                 id: "einruecken_all",
                 type: "standard",
-                applicableTypes: ["NGT6", "NGT8", "NGT8DD", "NGT12DD", "NGTDX"],
+                applicableTypes: ["NGT6DD", "NGT8DD", "NGTD8DD", "NGTD12DD", "NGTDXDD"],
                 title: "Einrücken & Abstellen",
                 categories: [
                     {
@@ -574,7 +574,7 @@
             {
                 id: "abruesten_all",
                 type: "standard",
-                applicableTypes: ["NGT6", "NGT8", "NGT8DD", "NGT12DD", "NGTDX"],
+                applicableTypes: ["NGT6DD", "NGT8DD", "NGTD8DD", "NGTD12DD", "NGTDXDD"],
                 title: "Abrüsten des Fahrzeugs",
                 categories: [
                     {
@@ -613,7 +613,7 @@
             {
                 id: "stoerung_bnu",
                 type: "standard",
-                applicableTypes: ["NGT6", "NGT8", "NGT8DD", "NGT12DD", "NGTDX"],
+                applicableTypes: ["NGT6DD", "NGT8DD", "NGTD8DD", "NGTD12DD", "NGTDXDD"],
                 title: "Störung: BNU-Ausfall (Bordnetz)",
                 categories: [
                     {
@@ -630,8 +630,8 @@
                         ]
                     },
                     {
-                        name: "Batterie-Pufferung: NGT6 & NGT8",
-                        condition: (context) => ["NGT6", "NGT8"].includes(context.tramType),
+                        name: "Batterie-Pufferung: NGT6DD & NGT8DD",
+                        condition: (context) => ["NGT6DD", "NGT8DD"].includes(context.tramType),
                         tasks: [
                             {
                                 text: "Restfahrzeit beachten: MAX. 20 MINUTEN!",
@@ -649,8 +649,8 @@
                         ]
                     },
                     {
-                        name: "Batterie-Pufferung: NGT8DD & NGT12DD",
-                        condition: (context) => ["NGT8DD", "NGT12DD"].includes(context.tramType),
+                        name: "Batterie-Pufferung: NGTD8DD & NGTD12DD",
+                        condition: (context) => ["NGTD8DD", "NGTD12DD"].includes(context.tramType),
                         tasks: [
                             {
                                 text: "Restfahrzeit beachten: MAX. 30 MINUTEN!",
@@ -667,8 +667,8 @@
                         ]
                     },
                     {
-                        name: "Verhalten beim NGTDX",
-                        condition: (context) => context.tramType === "NGTDX",
+                        name: "Verhalten beim NGTDXDD",
+                        condition: (context) => context.tramType === "NGTDXDD",
                         tasks: [
                             {
                                 text: "Status der Umformer am Display prüfen",
@@ -693,7 +693,7 @@
             {
                 id: "stoerung_tuer",
                 type: "standard",
-                applicableTypes: ["NGT6", "NGT8", "NGT8DD", "NGT12DD", "NGTDX"],
+                applicableTypes: ["NGT6DD", "NGT8DD", "NGTD8DD", "NGTD12DD", "NGTDXDD"],
                 title: "Störung: Türstörung / Tür defekt",
                 categories: [
                     {
@@ -728,8 +728,8 @@
                         ]
                     },
                     {
-                        name: "Manuelle Türverriegelung (NGT6 / NGT8)",
-                        condition: (context) => ["NGT6", "NGT8"].includes(context.tramType),
+                        name: "Manuelle Türverriegelung (NGT6DD / NGT8DD)",
+                        condition: (context) => ["NGT6DD", "NGT8DD"].includes(context.tramType),
                         tasks: [
                             {
                                 text: "Türflügel mechanisch sichern",
