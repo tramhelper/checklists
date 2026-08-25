@@ -1,7 +1,7 @@
 window.checklistsData.push({
     id: "abruesten_all",
     type: "standard",
-    applicableTypes: ["NGT6", "NGT8", "NGT8DD", "NGT12DD", "NGTDX"],
+    applicableTypes: ["NGT6DD", "NGT8DD", "NGTD8DD", "NGT12DD", "NGTDXDD"],
     title: "Abrüsten des Fahrzeugs",
     categories: [
         {

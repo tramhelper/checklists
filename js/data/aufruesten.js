@@ -1,13 +1,13 @@
 window.checklistsData.push({
     id: "aufruesten_all",
     type: "standard",
-    applicableTypes: ["NGT6", "NGT8", "NGT8DD", "NGT12DD", "NGTDX"], 
+    applicableTypes: ["NGT6DD", "NGT8DD", "NGTD8DD", "NGT12DD", "NGTDXDD"], 
     title: "Aufrüsten & Abfahrtskontrolle",
     categories: [
         {
             name: "Aufrüsten im Führerstand",
-            // Gilt nur für NGT6 und NGT8
-            condition: (context) => ["NGT6", "NGT8"].includes(context.tramType),
+            // Gilt nur für NGT6DD und NGT8DD
+            condition: (context) => ["NGT6DD", "NGT8DD"].includes(context.tramType),
             tasks: [
                 { 
                     text: "Fahrzeug aktivieren",
@@ -31,8 +31,8 @@ window.checklistsData.push({
         },
         {
             name: "Fahrzeugkontrolle (Wagenkästen)",
-            // Gilt nur für NGT6 und NGT8
-            condition: (context) => ["NGT6", "NGT8"].includes(context.tramType),
+            // Gilt nur für NGT6DD und NGT8DD
+            condition: (context) => ["NGT6DD", "NGT8DD"].includes(context.tramType),
             dynamic: "wagenkaesten_loop",
             outerTasks: [
                 { text: "Wagenkasten kontrollieren", note: "Läuft Flüssigkeit aus?" },
@@ -52,8 +52,8 @@ window.checklistsData.push({
         },
         {
             name: "Beleuchtung & Wischer",
-            // Gilt nur für NGT6 und NGT8
-            condition: (context) => ["NGT6", "NGT8"].includes(context.tramType),
+            // Gilt nur für NGT6DD und NGT8DD
+            condition: (context) => ["NGT6DD", "NGT8DD"].includes(context.tramType),
             tasks: [
                 { 
                     text: "Außenbeleuchtung prüfen", 

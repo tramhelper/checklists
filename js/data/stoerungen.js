@@ -2,7 +2,7 @@
 window.checklistsData.push({
     id: "stoerung_bnu",
     type: "standard",
-    applicableTypes: ["NGT6", "NGT8", "NGT8DD", "NGT12DD", "NGTDX"],
+    applicableTypes: ["NGT6DD", "NGT8DD", "NGTD8DD", "NGT12DD", "NGTDXDD"],
     title: "Störung: BNU-Ausfall (Bordnetz)",
     categories: [
         {
@@ -19,8 +19,8 @@ window.checklistsData.push({
             ]
         },
         {
-            name: "Batterie-Pufferung: NGT6 & NGT8",
-            condition: (context) => ["NGT6", "NGT8"].includes(context.tramType),
+            name: "Batterie-Pufferung: NGT6DD & NGT8DD",
+            condition: (context) => ["NGT6DD", "NGT8DD"].includes(context.tramType),
             tasks: [
                 {
                     text: "Restfahrzeit beachten: MAX. 20 MINUTEN!",
@@ -38,8 +38,8 @@ window.checklistsData.push({
             ]
         },
         {
-            name: "Batterie-Pufferung: NGT8DD & NGT12DD",
-            condition: (context) => ["NGT8DD", "NGT12DD"].includes(context.tramType),
+            name: "Batterie-Pufferung: NGTD8DD & NGT12DD",
+            condition: (context) => ["NGTD8DD", "NGT12DD"].includes(context.tramType),
             tasks: [
                 {
                     text: "Restfahrzeit beachten: MAX. 30 MINUTEN!",
@@ -56,8 +56,8 @@ window.checklistsData.push({
             ]
         },
         {
-            name: "Verhalten beim NGTDX",
-            condition: (context) => context.tramType === "NGTDX",
+            name: "Verhalten beim NGTDXDD",
+            condition: (context) => context.tramType === "NGTDXDD",
             tasks: [
                 {
                     text: "Status der Umformer am Display prüfen",
@@ -81,7 +81,7 @@ window.checklistsData.push({
 window.checklistsData.push({
     id: "stoerung_tuer",
     type: "standard",
-    applicableTypes: ["NGT6", "NGT8", "NGT8DD", "NGT12DD", "NGTDX"],
+    applicableTypes: ["NGT6DD", "NGT8DD", "NGTD8DD", "NGT12DD", "NGTDXDD"],
     title: "Störung: Türstörung / Tür defekt",
     categories: [
         {
@@ -116,8 +116,8 @@ window.checklistsData.push({
             ]
         },
         {
-            name: "Manuelle Türverriegelung (NGT6 / NGT8)",
-            condition: (context) => ["NGT6", "NGT8"].includes(context.tramType),
+            name: "Manuelle Türverriegelung (NGT6DD / NGT8DD)",
+            condition: (context) => ["NGT6DD", "NGT8DD"].includes(context.tramType),
             tasks: [
                 {
                     text: "Türflügel mechanisch sichern",
