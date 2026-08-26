@@ -1,7 +1,7 @@
 window.checklistsData.push({
     id: "einruecken_all",
     type: "standard",
-    applicableTypes: ["NGT6DD", "NGT8DD", "NGTD8DD", "NGT12DD", "NGTDXDD"],
+    applicableTypes: ["NGT6DD", "NGT8DD", "NGTD8DD", "NGTD12DD", "NGTDXDD"],
     title: "Einrücken & Abstellen",
     categories: [
         {

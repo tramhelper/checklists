@@ -22,4 +22,28 @@ window.checklistsData.push({
             ]
         }
     ]
+},
+{
+    id: "sprechwunsch_dwagen",
+    type: "standard",
+    applicableTypes: ["NGTD8DD", "NGTD12DD"],
+    title: "Dienstbetrieb: Fahrgast-Sprechwunsch (NGT D6 / NGT D8)",
+    categories: [
+        {
+            name: "Sprechwunsch entgegennehmen",
+            tasks: [
+                {
+                    text: "Gesprächsaufbau",
+                    subtasks: [
+                        { text: "Sprechwunsch-Taste drücken" },
+                        { text: "Vorwahlschalter auf 'Innendurchsage' stellen" }
+                    ]
+                },
+                {
+                    text: "Automatischer Abbruch beachten",
+                    note: "WICHTIG: Nach der automatischen Durchsage der nächsten Haltestelle wird der Sprechwunsch automatisch abgelehnt, sofern er bis dahin nicht angenommen wurde!"
+                }
+            ]
+        }
+    ]
 });

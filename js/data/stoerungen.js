@@ -1,8 +1,43 @@
+// --- STÖRUNG: VEREISTE OBERLEITUNG (NEU) ---
+window.checklistsData.push({
+    id: "stoerung_oberleitung_eis",
+    type: "standard",
+    applicableTypes: ["NGT6DD", "NGT8DD", "NGTD8DD", "NGTD12DD", "NGTDXDD"],
+    title: "Störung: Vereiste Oberleitung",
+    categories: [
+        {
+            name: "Verhalten bei Siemens-Fahrzeugen (NGT6DD / NGT8DD)",
+            condition: (context) => ["NGT6DD", "NGTD8DD"].includes(context.tramType),
+            tasks: [
+                {
+                    text: "Leitstelle informieren & Abschleppen vorbereiten",
+                    note: "Siemens-Fahrzeuge können bei stark vereister Oberleitung in der Regel nicht aus eigener Kraft weiterfahren und müssen abgeschleppt werden."
+                }
+            ]
+        },
+        {
+            name: "Verhalten bei Bombardier-Fahrzeugen (NGTD8DD / NGTD12DD)",
+            condition: (context) => ["NGTD8DD", "NGTD12DD"].includes(context.tramType),
+            tasks: [
+                {
+                    text: "Wintertaste aktivieren",
+                    subtasks: [
+                        { text: "Weisung der Leitstelle einholen" },
+                        { text: "Wintertaste auf dem linken Seitenpanel betätigen" },
+                        { text: "Hinweis: Reduziert die Spannungsaufnahme, setzt Gesamtspannung auf 380 V und schaltet den Passagierkomfort (Heizung/Klima) ab." },
+                        { text: "Geschwindigkeit beachten: Schaltet sich ab 30 km/h automatisch ab!" }
+                    ]
+                }
+            ]
+        }
+    ]
+});
+
 // --- STÖRUNG: BNU-AUSFALL ---
 window.checklistsData.push({
     id: "stoerung_bnu",
     type: "standard",
-    applicableTypes: ["NGT6DD", "NGT8DD", "NGTD8DD", "NGT12DD", "NGTDXDD"],
+    applicableTypes: ["NGT6DD", "NGTD8DD", "NGTD8DD", "NGTD12DD", "NGTDXDD"],
     title: "Störung: BNU-Ausfall (Bordnetz)",
     categories: [
         {
@@ -38,8 +73,8 @@ window.checklistsData.push({
             ]
         },
         {
-            name: "Batterie-Pufferung: NGTD8DD & NGT12DD",
-            condition: (context) => ["NGTD8DD", "NGT12DD"].includes(context.tramType),
+            name: "Batterie-Pufferung: NGTD8DD & NGTD12DD",
+            condition: (context) => ["NGTD8DD", "NGTD12DD"].includes(context.tramType),
             tasks: [
                 {
                     text: "Restfahrzeit beachten: MAX. 30 MINUTEN!",
@@ -81,12 +116,16 @@ window.checklistsData.push({
 window.checklistsData.push({
     id: "stoerung_tuer",
     type: "standard",
-    applicableTypes: ["NGT6DD", "NGT8DD", "NGTD8DD", "NGT12DD", "NGTDXDD"],
+    applicableTypes: ["NGT6DD", "NGT8DD", "NGTD8DD", "NGTD12DD", "NGTDXDD"],
     title: "Störung: Türstörung / Tür defekt",
     categories: [
         {
-            name: "Sicherheits- & Räumungskriterien",
+            name: "Erste Maßnahme & Sicherheitskriterien",
             tasks: [
+                {
+                    text: "Erstversuch über Zentralsteuerung",
+                    note: "Zunächst versuchen, die Türen einmal zentral zu öffnen und wieder zentral zu schließen."
+                },
                 {
                     text: "Fluchtwege kontrollieren",
                     note: "ACHTUNG: Sind ZWEI nebeneinanderliegende Türen defekt, darf das Fahrzeug wegen unzureichender Fluchtwege NICHT mehr für den Fahrgastverkehr genutzt werden (Ausschieben/Einrücken)!"

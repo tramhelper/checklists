@@ -1,12 +1,12 @@
 window.checklistsData.push({
     id: "aufruesten_all",
     type: "standard",
-    applicableTypes: ["NGT6DD", "NGT8DD", "NGTD8DD", "NGT12DD", "NGTDXDD"], 
+    applicableTypes: ["NGT6DD", "NGT8DD", "NGTD8DD", "NGTD12DD", "NGTDXDD"], 
     title: "Aufrüsten & Abfahrtskontrolle",
     categories: [
+        // --- FÜHRERSTAND: SIEMENS (NGT6DD / NGT8DD) ---
         {
-            name: "Aufrüsten im Führerstand",
-            // Gilt nur für NGT6DD und NGT8DD
+            name: "Aufrüsten im Führerstand (Siemens NGT6DD / NGT8DD)",
             condition: (context) => ["NGT6DD", "NGT8DD"].includes(context.tramType),
             tasks: [
                 { 
@@ -26,13 +26,47 @@ window.checklistsData.push({
                         { text: "Fahrersitz einstellen" },
                         { text: "Abschluss durch erneutes Drücken der Taste" }
                     ]
+                },
+                {
+                    text: "Beleuchtung für Außenkontrolle aktivieren",
+                    note: "Abblendlicht und Warnblinklicht einschalten."
                 }
             ]
         },
+
+        // --- FÜHRERSTAND: BOMBARDIER D-WAGEN (NGTD8DD / NGTD12DD) ---
+        {
+            name: "Aufrüsten im Führerstand (Bombardier NGT D12 / NGT D8)",
+            condition: (context) => ["NGTD8DD", "NGTD12DD"].includes(context.tramType),
+            tasks: [
+                {
+                    text: "Aktivierung & Vorbereitung",
+                    subtasks: [
+                        { text: "Fahrtrichtungswähler in Position Sternchen (*)" },
+                        { text: "Stromabnehmer heben (lässt sich direkt heben)" },
+                        { text: "Kabinenlicht / Führerstandslicht ggf. einschalten" },
+                        { text: "Fahrersitz und Lehne einstellen" },
+                        { text: "Lichttest / Lampentest für Tasterköpfe betätigen" }
+                    ]
+                },
+                {
+                    text: "Türen schließen & Komponententest",
+                    subtasks: [
+                        { text: "Alle Türen schließen" },
+                        { text: "Komponententest durchführen" },
+                        { text: "Erfolg mit dem Komponententest-Knopf bestätigen" }
+                    ]
+                },
+                {
+                    text: "Vorbereitung für Außenkontrolle",
+                    note: "Abblendlicht, Warnblinklicht und Türfreigabe aktivieren."
+                }
+            ]
+        },
+
+        // --- WAGENKASTENKONTROLLE (Dynamisch für alle) ---
         {
             name: "Fahrzeugkontrolle (Wagenkästen)",
-            // Gilt nur für NGT6DD und NGT8DD
-            condition: (context) => ["NGT6DD", "NGT8DD"].includes(context.tramType),
             dynamic: "wagenkaesten_loop",
             outerTasks: [
                 { text: "Wagenkasten kontrollieren", note: "Läuft Flüssigkeit aus?" },
@@ -50,17 +84,16 @@ window.checklistsData.push({
                 { text: "Heckfahrstand überprüfen", note: "Prüfen, ob dieser verschlossen ist.", onlyLast: true }
             ]
         },
+
+        // --- BELEUCHTUNG & WISCHER ---
         {
             name: "Beleuchtung & Wischer",
-            // Gilt nur für NGT6DD und NGT8DD
-            condition: (context) => ["NGT6DD", "NGT8DD"].includes(context.tramType),
             tasks: [
                 { 
                     text: "Außenbeleuchtung prüfen", 
                     subtasks: [
-                        { text: "Abblendlicht & Warnblinklicht an (Wurde nach Komponententest eingeschaltet)" },
-                        { text: "Blinkt das Warnblinklicht außen?" },
-                        { text: "ZG2 (Schlusslicht) - Ist das Schlusslicht an?" }
+                        { text: "Warnblinklicht außen blinkt?" },
+                        { text: "ZG2 (Schlusslicht) eingeschaltet?" }
                     ]
                 },
                 { 
@@ -73,9 +106,10 @@ window.checklistsData.push({
                 }
             ]
         },
+
+        // --- IBIS & LEITSTELLE ---
         {
             name: "IBIS & Leitstelle (Kommunikation)",
-            // Gilt für ALLE Fahrzeuge
             tasks: [
                 { 
                     text: "IBIS vorbereiten", 
@@ -95,9 +129,10 @@ window.checklistsData.push({
                 }
             ]
         },
+
+        // --- ABSCHLUSS & AUSFAHRT ---
         {
             name: "Abschluss & Ausfahrt",
-            // Gilt für ALLE Fahrzeuge
             tasks: [
                 { 
                     text: "Abfahrbereit machen",
