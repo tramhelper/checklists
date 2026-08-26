@@ -25,8 +25,12 @@ window.showMenu = function() {
     document.getElementById('view-menu').classList.add('active');
     document.getElementById('view-locations').classList.remove('active');
     document.getElementById('view-checklist').classList.remove('active');
+    document.getElementById('view-map').classList.remove('active'); // NEU
+
     document.getElementById('btnNavMenu').classList.add('active');
     document.getElementById('btnNavLocations').classList.remove('active');
+    document.getElementById('btnNavMap').classList.remove('active'); // NEU
+    
     document.getElementById('fabBack').style.display = 'none';
     renderMenu();
     window.scrollTo(0, 0);
@@ -37,10 +41,36 @@ window.showLocations = function() {
     document.getElementById('view-locations').classList.add('active');
     document.getElementById('view-menu').classList.remove('active');
     document.getElementById('view-checklist').classList.remove('active');
+    document.getElementById('view-map').classList.remove('active'); // NEU
+
     document.getElementById('btnNavLocations').classList.add('active');
     document.getElementById('btnNavMenu').classList.remove('active');
+    document.getElementById('btnNavMap').classList.remove('active'); // NEU
+    
     document.getElementById('fabBack').style.display = 'none';
     renderLocations();
+    window.scrollTo(0, 0);
+};
+
+// NEUE FUNKTION FÜR DIE KARTE
+window.showMap = function() {
+    currentView = 'map';
+    document.getElementById('view-map').classList.add('active');
+    document.getElementById('view-menu').classList.remove('active');
+    document.getElementById('view-locations').classList.remove('active');
+    document.getElementById('view-checklist').classList.remove('active');
+
+    document.getElementById('btnNavMap').classList.add('active');
+    document.getElementById('btnNavMenu').classList.remove('active');
+    document.getElementById('btnNavLocations').classList.remove('active');
+    
+    document.getElementById('fabBack').style.display = 'none';
+    
+    // Initialisiert die Karte nur beim allerersten Aufruf, 
+    // um Datenvolumen und Ladezeit zu sparen!
+    if (!window.mapInitialized) {
+        window.initMap();
+    }
     window.scrollTo(0, 0);
 };
 
@@ -234,6 +264,7 @@ window.openChecklist = function(listId, isLiveUpdate = false) {
 
     document.getElementById('view-menu').classList.remove('active');
     document.getElementById('view-locations').classList.remove('active');
+    document.getElementById('view-map').classList.remove('active');
     document.getElementById('view-checklist').classList.add('active');
     document.getElementById('fabBack').style.display = 'block';
     if (!isLiveUpdate) window.scrollTo(0, 0);
