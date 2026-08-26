@@ -22,7 +22,7 @@ window.initMap = function() {
 };
 
 async function fetchTramData() {
-    // Fragt bei der Overpass-API alle "tram" Relationen rund um die Koordinaten von Dresden ab
+    // Die Suchanfrage für die DVB-Straßenbahnen
     const query = `
         [out:json][timeout:25];
         (
@@ -30,10 +30,24 @@ async function fetchTramData() {
         );
         out geom;
     `;
-    const url = "https://overpass-api.de/api/interpreter?data=" + encodeURIComponent(query);
+    
+    const url = "https://overpass-api.de/api/interpreter";
 
     try {
-        const response = await fetch(url);
+        // Wir nutzen jetzt POST statt GET. Das verhindert CORS-Fehler!
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                // Das sagt dem Browser, dass es ein "einfaches" Formular ist (verhindert strenge CORS-Checks)
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "data=" + encodeURIComponent(query)
+        });
+
+        if (!response.ok) {
+            throw new Error(`API Fehler: ${response.status}`);
+        }
+
         const data = await response.json();
         processOverpassData(data);
     } catch (error) {
