@@ -67,15 +67,31 @@
             <h2 class="checklist-title" id="currentChecklistTitle">Titel</h2>
             <div id="checklistContainer"></div>
         </div>
-         <div id="view-map" class="view">
-            <div class="menu-section-title">Interaktives Liniennetz</div>
-            <div class="map-controls">
-                <label for="lineFilter">Linie auswählen:</label>
-                <select id="lineFilter" onchange="filterMapLines()">
-                    <option value="all">Alle Linien anzeigen</option>
-                </select>
+         <!-- NEU: ANSICHT 4: KARTEN -->
+        <div id="view-map" class="view">
+            <div class="menu-section-title">DVB Liniennetz</div>
+            
+            <!-- Umschalter -->
+            <div class="map-toggle">
+                <button id="btnInteractiveMap" class="toggle-btn active" onclick="switchMapMode('interactive')">Interaktiv (OSM)</button>
+                <button id="btnStaticMap" class="toggle-btn" onclick="switchMapMode('static')">Offizieller Netzplan</button>
             </div>
-            <div id="mapContainer"></div>
+
+            <!-- INTERAKTIVE KARTE -->
+            <div id="interactiveWrapper">
+                <div class="map-controls">
+                    <label for="lineFilter">Linie auswählen:</label>
+                    <select id="lineFilter" onchange="filterMapLines()">
+                        <option value="all">Alle Linien anzeigen</option>
+                    </select>
+                </div>
+                <div id="mapContainer"></div>
+            </div>
+
+            <!-- STATISCHES BILD (Offizieller Plan) -->
+            <div id="staticMapContainer" style="display:none;">
+                <img src="netzplan.jpg" alt="DVB Offizieller Netzplan" class="static-map-img">
+            </div>
         </div>
     </main>
 

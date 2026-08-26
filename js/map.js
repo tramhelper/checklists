@@ -1,58 +1,55 @@
 let map;
-let tramLines = {}; // Speichert die Linien nach Nummer sortiert
-let activeLinesGroup; // Layer, der aktuell auf der Karte angezeigt wird
-
+let tramLines = {}; 
+let activeLinesGroup; 
 window.mapInitialized = false;
 
 window.initMap = function() {
-    // Karte erstellen und auf Dresden zentrieren
     map = L.map('mapContainer').setView([51.0504, 13.7373], 12);
 
-    // OpenStreetMap Kacheln laden
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
+        attribution: '&copy; OpenStreetMap',
         maxZoom: 18
     }).addTo(map);
 
     activeLinesGroup = L.layerGroup().addTo(map);
 
-    // Daten von Overpass API abrufen
-    fetchTramData();
+    // Lade die Daten jetzt LOKAL von deinem Server!
+    fetchLocalTramData();
     window.mapInitialized = true;
 };
 
-async function fetchTramData() {
-    // Die Suchanfrage für die DVB-Straßenbahnen
-    const query = `
-        [out:json][timeout:25];
-        (
-          relation["route"="tram"](50.95,13.6,51.15,13.9);
-        );
-        out geom;
-    `;
-    
-    const url = "https://overpass-api.de/api/interpreter";
+// Toggle-Funktion zwischen Interaktiv und Statisch
+window.switchMapMode = function(mode) {
+    if (mode === 'interactive') {
+        document.getElementById('interactiveWrapper').style.display = 'block';
+        document.getElementById('staticMapContainer').style.display = 'none';
+        document.getElementById('btnInteractiveMap').classList.add('active');
+        document.getElementById('btnStaticMap').classList.remove('active');
+        
+        // Leaflet zickt manchmal, wenn es aus dem Hintergrund geholt wird. Das hier fixt es:
+        if (map) map.invalidateSize(); 
+    } else {
+        document.getElementById('interactiveWrapper').style.display = 'none';
+        document.getElementById('staticMapContainer').style.display = 'block';
+        document.getElementById('btnStaticMap').classList.add('active');
+        document.getElementById('btnInteractiveMap').classList.remove('active');
+    }
+};
 
+async function fetchLocalTramData() {
     try {
-        // Wir nutzen jetzt POST statt GET. Das verhindert CORS-Fehler!
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                // Das sagt dem Browser, dass es ein "einfaches" Formular ist (verhindert strenge CORS-Checks)
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: "data=" + encodeURIComponent(query)
-        });
-
+        // Pfad zur manuell heruntergeladenen Datei
+        const response = await fetch('js/data/liniennetz.json'); 
+        
         if (!response.ok) {
-            throw new Error(`API Fehler: ${response.status}`);
+            throw new Error(`HTTP Fehler! Status: ${response.status}`);
         }
 
         const data = await response.json();
         processOverpassData(data);
     } catch (error) {
-        console.error("Fehler beim Laden der Kartendaten:", error);
-        alert("Das Liniennetz konnte leider nicht geladen werden.");
+        console.error("Fehler beim Laden der lokalen Kartendaten:", error);
+        alert("Das interaktive Liniennetz konnte nicht geladen werden.\n\nBitte stelle sicher, dass die Datei 'liniennetz.json' im Ordner 'js/data' hochgeladen wurde.");
     }
 }
 
@@ -62,9 +59,8 @@ function processOverpassData(data) {
 
     data.elements.forEach(rel => {
         if (rel.type === 'relation' && rel.tags) {
-            const ref = rel.tags.ref; // Die Liniennummer
+            const ref = rel.tags.ref; 
             
-            // Herausfiltern von Schienenersatzverkehr oder unbenannten Linien
             if (!ref || isNaN(parseInt(ref))) return; 
 
             linesFound.add(ref);
@@ -75,7 +71,6 @@ function processOverpassData(data) {
 
             const lineColor = getDvbColor(ref);
 
-            // Geometrie (die Koordinaten) auslesen
             rel.members.forEach(member => {
                 if (member.type === 'way' && member.geometry) {
                     const latlngs = member.geometry.map(pos => [pos.lat, pos.lon]);
@@ -86,17 +81,16 @@ function processOverpassData(data) {
                         opacity: 0.8
                     });
                     
-                    // Popup beim Antippen auf der Karte
                     polyline.bindPopup(`<b>Linie ${ref}</b><br>${rel.tags.name || ''}`);
                     
                     tramLines[ref].addLayer(polyline);
-                    activeLinesGroup.addLayer(polyline); // Direkt auf die Karte werfen
+                    activeLinesGroup.addLayer(polyline); 
                 }
             });
         }
     });
 
-    // Dropdown-Menü mit den gefundenen Linien füllen
+    // Dropdown füllen
     const sortedLines = Array.from(linesFound).sort((a,b) => parseInt(a) - parseInt(b));
     sortedLines.forEach(line => {
         const opt = document.createElement('option');
@@ -106,39 +100,26 @@ function processOverpassData(data) {
     });
 }
 
-// Setzt die echten DVB-Farben für die Karte
 function getDvbColor(ref) {
     const colors = {
-        "1": "#E3A32B",  // Gold/Ocker
-        "2": "#D92A32",  // Rot
-        "3": "#005D8C",  // Blau
-        "4": "#F39200",  // Orange-Gelb
-        "6": "#8F4299",  // Lila
-        "7": "#E87C29",  // Orange
-        "8": "#86C543",  // Hellgrün
-        "9": "#E05A9C",  // Pink
-        "10": "#A63D40", // Dunkelrot
-        "11": "#FCE300", // Gelb
-        "12": "#008A51", // Dunkelgrün
-        "13": "#00A19B"  // Türkis
+        "1": "#E3A32B", "2": "#D92A32", "3": "#005D8C", 
+        "4": "#F39200", "6": "#8F4299", "7": "#E87C29", 
+        "8": "#86C543", "9": "#E05A9C", "10": "#A63D40", 
+        "11": "#FCE300", "12": "#008A51", "13": "#00A19B"
     };
-    return colors[ref] || "#333333"; // Falls eine neue Linie existiert: Grau
+    return colors[ref] || "#333333"; 
 }
 
-// Wird aufgerufen, wenn man das Dropdown ändert
 window.filterMapLines = function() {
     const selected = document.getElementById('lineFilter').value;
     
-    // Karte säubern
     activeLinesGroup.clearLayers();
 
     if (selected === 'all') {
-        // Alle wieder hinzufügen
         for (let ref in tramLines) {
             tramLines[ref].eachLayer(layer => activeLinesGroup.addLayer(layer));
         }
     } else {
-        // Nur die ausgewählte Linie hinzufügen
         if (tramLines[selected]) {
             tramLines[selected].eachLayer(layer => activeLinesGroup.addLayer(layer));
         }

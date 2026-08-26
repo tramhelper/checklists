@@ -64,7 +64,9 @@ window.showMap = function() {
     document.getElementById('btnNavLocations').classList.remove('active');
     
     document.getElementById('fabBack').style.display = 'none';
-
+    
+    // Initialisiert die Karte nur beim allerersten Aufruf, 
+    // um Datenvolumen und Ladezeit zu sparen!
     if (!window.mapInitialized) {
         window.initMap();
     }

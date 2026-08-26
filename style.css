@@ -332,3 +332,35 @@ main {
     align-items: center;
     gap: 15px;
 }
+
+/* --- KARTEN UMSCHALTER & LAYOUT --- */
+.map-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.toggle-btn {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid var(--primary);
+    background-color: transparent;
+    color: var(--text);
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.toggle-btn.active {
+    background-color: var(--primary);
+    color: var(--text);
+}
+
+.static-map-img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
