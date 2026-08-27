@@ -25,7 +25,8 @@ window.checklistsData.push({
                     ]
                 },
                 { 
-                    text: "Bei inaktiver Fahrstraße", 
+                    text: "Bei inaktiver Fahrstraße",
+                    isHint: true,
                     note: "Elektrische Weichen müssen handgestellt werden (auch stumpf befahrene, um mechanisches Auffahren zu verhindern)!" 
                 }
             ]
@@ -36,20 +37,19 @@ window.checklistsData.push({
             tasks: [
                 { 
                     text: "Allgemeine Hinweise", 
-                    subtasks: [
-                        { text: "Im Normalfall ohne Anmeldung einrücken." },
-                        { text: "11.30 bis 15.00 Uhr: Kein Einsatzleiter in Reick! Bei Gesprächsbedarf in Gorbitz melden." }
-                    ]
+                    isHint: true,
+                    note: "• Im Normalfall ohne Anmeldung einrücken.<br>• 11.30 bis 15.00 Uhr: Kein Einsatzleiter in Reick! Bei Gesprächsbedarf in Gorbitz melden."
                 },
                 { 
                     text: "Besonderheiten auf der Strecke", 
-                    subtasks: [
-                        { text: "Signal SO61 / SO62: Wenn Signal nicht steht, Kreuzung mit PKW-Verkehr nicht befahren." },
-                        { text: "Genug Abstand halten, damit eigene Zuweisung nicht auf vorderes Fahrzeug angewendet wird." },
-                        { text: "Blinkt Leuchte BTF? Sofort vor Signal anhalten & Einsatzleiter kontaktieren." }
-                    ]
+                    isHint: true,
+                    note: "• Signal SO61 / SO62: Wenn Signal nicht steht, Kreuzung mit PKW-Verkehr nicht befahren.<br>• Genug Abstand halten, damit eigene Zuweisung nicht auf vorderes Fahrzeug angewendet wird.<br>• Blinkt Leuchte BTF? Sofort vor Signal anhalten & Einsatzleiter kontaktieren."
                 },
-                { text: "Abstellen in der Halle", note: "Rettungswege (gelb) unbedingt freihalten!" }
+                { 
+                    text: "Abstellen in der Halle",
+                    isHint: true,
+                    note: "Rettungswege (gelb) unbedingt freihalten!"
+                }
             ]
         }
     ]

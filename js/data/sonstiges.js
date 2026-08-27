@@ -41,6 +41,7 @@ window.checklistsData.push({
                 },
                 {
                     text: "Automatischer Abbruch beachten",
+                    isHint: true,
                     note: "WICHTIG: Nach der automatischen Durchsage der nächsten Haltestelle wird der Sprechwunsch automatisch abgelehnt, sofern er bis dahin nicht angenommen wurde!"
                 }
             ]

@@ -116,36 +116,43 @@ function createMenuItem(list, sourceView) {
 function getExpandedCategories(list, context) {
     let result = [];
     list.categories.forEach((category, catIndex) => {
-        // Prüfen, ob die ganze Kategorie für den aktuellen Kontext gültig ist
         if (category.condition && !category.condition(context)) return;
 
         if (category.dynamic === 'wagenkaesten_loop') {
-            const count = tramConfig[context.tramType].wagenkaesten || 5;
+            const count = tramConfig[context.tramType]?.wagenkaesten || 5;
             let generatedTasks = [];
-            
-            for (let i = 1; i <= count; i++) {
-                let outerSub = category.outerTasks.filter(t => {
-                    if (t.onlyFirst && i !== 1) return false;
-                    if (t.onlyLast && i !== count) return false;
-                    return true;
-                });
-                if (outerSub.length > 0) {
-                    generatedTasks.push({
-                        text: `Wagenkasten ${i} Außen`,
-                        subtasks: outerSub
+            const reverse = category.reverse || false;
+            const start = reverse ? count : 1;
+            const end = reverse ? 1 : count;
+            const step = reverse ? -1 : 1;
+
+            for (let i = start; reverse ? i >= end : i <= end; i += step) {
+                if (category.outerTasks) {
+                    let outerSub = category.outerTasks.filter(t => {
+                        if (t.onlyFirst && i !== 1) return false;
+                        if (t.onlyLast && i !== count) return false;
+                        return true;
                     });
+                    if (outerSub.length > 0) {
+                        generatedTasks.push({
+                            text: category.outerLabel ? category.outerLabel.replace('{i}', i) : `Wagenkasten ${i} Außen`,
+                            subtasks: outerSub
+                        });
+                    }
                 }
                 
-                let innerSub = category.innerTasks.filter(t => {
-                    if (t.onlyFirst && i !== 1) return false;
-                    if (t.onlyLast && i !== count) return false;
-                    return true;
-                });
-                if (innerSub.length > 0) {
-                    generatedTasks.push({
-                        text: `Wagenkasten ${i} Innen`,
-                        subtasks: innerSub
+                if (category.innerTasks) {
+                    let innerSub = category.innerTasks.filter(t => {
+                        if (t.onlyFirst && i !== 1) return false;
+                        if (t.onlyLast && i !== count) return false;
+                        return true;
                     });
+                    if (innerSub.length > 0) {
+                        generatedTasks.push({
+                            text: category.innerLabel ? category.innerLabel.replace('{i}', i) : `Wagenkasten ${i} Innen`,
+                            subtasks: innerSub
+                        });
+                    }
                 }
             }
             
@@ -176,6 +183,7 @@ window.toggleEntireList = function(listId, isChecked, sourceView) {
     
     expanded.forEach((cat) => {
         cat.tasks.forEach((item) => {
+            if (item.task.isHint) return;
             const tId = `${cat.originalCatIndex}-0-${item.taskIndex}`;
             state[tId] = isChecked;
             if (item.task.subtasks) {
@@ -215,7 +223,14 @@ window.openChecklist = function(listId, isLiveUpdate = false) {
 
             html += `<div class="task-group">`;
             
-            if (item.task.subtasks && item.task.subtasks.length > 0) {
+            if (item.task.isHint) {
+                html += `
+                    <div class="hint-card">
+                        <div class="task-text">${item.task.text}</div>
+                        ${item.task.note ? `<div class="task-note">${item.task.note}</div>` : ''}
+                    </div>
+                `;
+            } else if (item.task.subtasks && item.task.subtasks.length > 0) {
                 html += `
                     <label class="task-card parent-card ${isParentChecked ? 'checked' : ''}">
                         <input type="checkbox" class="task-checkbox parent-cb" ${isParentChecked ? 'checked' : ''} 
@@ -328,6 +343,7 @@ function checkIfListIsComplete(listId) {
     
     expanded.forEach((cat) => {
         cat.tasks.forEach((item) => {
+            if (item.task.isHint) return;
             if (item.task.condition && !item.task.condition(currentContext)) return;
             const tId = `${cat.originalCatIndex}-0-${item.taskIndex}`;
             if (!state[tId]) allDone = false;
