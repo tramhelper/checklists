@@ -73,7 +73,8 @@ window.checklistsData.push({
                     text: "Aktivierung des Fahrzeugs",
                     subtasks: [
                         { text: "Fahrzeugschlüssel stecken und 90° im Uhrzeigersinn drehen" },
-                        { text: "Richtungswahlschalter auf Sternchen (*) stellen (Fahrzeug schaltet ein & Stromabnehmer hebt sich)" },
+                        { text: "Richtungswahlschalter auf Sternchen (*) stellen" },
+                        { text: "Stromabnehmer heben"},
                         { text: "Warten, bis die rote Leuchte 'LT' auf der linken Seite des Bedienterminals nicht mehr blinkt" },
                         { text: "Fahrersitz, Fußpodest, Armlehne und Sollwertgeber einstellen" }
                     ]
